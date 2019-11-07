@@ -1,0 +1,617 @@
+setwd("C:/Users/nicho/Desktop/Courses/advanced stats 3015/Assignments/Assignment 1")
+
+# read in the data
+ass1<-read.delim("assignment01Data03.dat", header= TRUE, sep = " ")
+# view
+View(ass1)
+
+library(psych)
+library(ggplot2)
+library(pastecs)
+library(car)
+
+# look at structure for interval data or better
+str(ass1)
+describe(ass1)
+ass1Reduced = ass1[,3:9]
+
+# check normality with stat.desc - report skew and kurtosis, 2SE column tells if it is significant
+stat.desc(ass1,basic=F, norm=T)
+
+stat.desc(ass1$TPS.Extroversion, basic = FALSE, norm = TRUE)
+stat.desc(ass1$TPS.Psychoticism, basic = FALSE, norm = TRUE)
+#stat.desc(ass1$NoPschot, basic = FALSE, norm = TRUE)
+stat.desc(ass1$TPS.Neuroticism, basic = FALSE, norm = TRUE)
+stat.desc(ass1$TPS.Sociability, basic = FALSE, norm = TRUE)
+stat.desc(ass1$TSS.PhysicalReactions, basic = FALSE, norm = TRUE)
+stat.desc(ass1$TSS.PsychologicalReactions, basic = FALSE, norm = TRUE)
+stat.desc(ass1$TSS.TotalStress, basic = FALSE, norm = TRUE)
+
+
+#  Another option to look for normalty
+shapiro.test(ass1$TPS.Extroversion)
+shapiro.test(ass1$TPS.Psychoticism)
+#shapiro.test(ass1$NoPschot)
+shapiro.test(ass1$TPS.Neuroticism)
+shapiro.test(ass1$TPS.Sociability)
+shapiro.test(ass1$TSS.PhysicalReactions)
+shapiro.test(ass1$TSS.PsychologicalReactions)
+shapiro.test(ass1$TSS.TotalStress)
+
+
+# Another option - DENSITY PLOT WITH A NORMAL CURVE
+densityTStress <- ggplot(ass1, aes(TSS.TotalStress)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TSS.TotalStress, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TSS.TotalStress, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = "Total Stress Scores", 
+       y = "Density")
+
+densityTStress  # DO THIS TO VIEW THE GRAPH
+
+
+
+densityPsych <- ggplot(ass1, aes(TSS.PsychologicalReactions)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TSS.PsychologicalReactions, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TSS.PsychologicalReactions, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = "Psychological Reaction Scores", 
+       y = "Density")
+
+densityPsych 
+
+
+
+densityPhys <- ggplot(ass1, aes(TSS.PhysicalReactions)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TSS.PhysicalReactions, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TSS.PhysicalReactions, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = "Physical Reaction Scores", 
+       y = "Density")
+
+densityPhys 
+
+
+
+
+densityNeur <- ggplot(ass1, aes(TPS.Neuroticism)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TPS.Neuroticism, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TPS.Neuroticism, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = " Neuroticism Scores", 
+       y = "Density")
+
+densityNeur 
+
+
+
+
+densitySoc <- ggplot(ass1, aes(TPS.Sociability)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TPS.Sociability, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TPS.Sociability, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = " Sociability Scores", 
+       y = "Density")
+
+densitySoc 
+
+
+
+#######to remove impossible value from Psychoticism scale range 1 to 7 #
+ass1$NoPschot<-ifelse(ass1$TPS.Psychoticism > 7, NA, ass1$TPS.Psychoticism)
+View(ass1$NoPschot)
+
+
+densityNoPschot <- ggplot(ass1, aes(NoPschot)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$NoPschot, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$NoPschot, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = " Psychoticism Scores (No Impossible Scores)", 
+       y = "Density")
+
+densityNoPschot 
+
+
+
+
+densityPsychoticism <- ggplot(ass1, aes(TPS.Psychoticism)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TPS.Psychoticism, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TPS.Psychoticism, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = "Psychoticism  Scores", 
+       y = "Density")
+
+densityPsychoticism 
+
+
+
+
+densityExtro <- ggplot(ass1, aes(TPS.Extroversion)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$TPS.Extroversion, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$TPS.Extroversion, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = "Extroversion  Scores", 
+       y = "Density")
+
+densityExtro 
+
+
+
+#  another option - qqplot 
+qqplot.Neuro <- qqnorm(ass1$TPS.Neuroticism,
+                           xlab = "Theoretical Quantiles", 
+                           ylab = "Sample Quantiles Neuroticism")
+qqline(ass1$TPS.Neuroticism)
+
+
+
+qqplot.Psychoticism <- qqnorm(ass1$TPS.Psychoticism,
+                       xlab = "Theoretical Quantiles", 
+                       ylab = "Sample Quantiles Psychoticism")
+qqline(ass1$TPS.Psychoticism)
+
+
+
+
+qqplot.NoPsych <- qqnorm(ass1$NoPschot,
+                              xlab = "Theoretical Quantiles", 
+                              ylab = "Sample Quantiles Psychoticism (No Impossible Values")
+qqline(ass1$NoPschot)
+
+
+
+
+qqplot.Extro <- qqnorm(ass1$TPS.Extroversion,
+                              xlab = "Theoretical Quantiles", 
+                              ylab = "Sample Quantiles Extroversion")
+qqline(ass1$TPS.Extroversion)
+
+
+
+
+qqplot.Soc <- qqnorm(ass1$TPS.Sociability,
+                       xlab = "Theoretical Quantiles", 
+                       ylab = "Sample Quantiles Sociability")
+qqline(ass1$TPS.Sociability)
+
+
+
+
+qqplot.Physical <- qqnorm(ass1$TSS.PhysicalReactions,
+                     xlab = "Theoretical Quantiles", 
+                     ylab = "Sample Quantiles Physical Reactions")
+qqline(ass1$TSS.PhysicalReactions)
+
+
+
+
+qqplot.Psychological <- qqnorm(ass1$TSS.PsychologicalReactions,
+                          xlab = "Theoretical Quantiles", 
+                          ylab = "Sample Quantiles Psychological Reactions")
+qqline(ass1$TSS.PsychologicalReactions)
+
+
+
+
+qqplot.TotalStress <- qqnorm(ass1$TSS.TotalStress,
+                               xlab = "Theoretical Quantiles", 
+                               ylab = "Sample Quantiles Total Stress")
+qqline(ass1$TSS.TotalStress)
+
+
+
+#  check for linearity for correlation
+scatterNeuroPhys <- ggplot(ass1, aes(TPS.Neuroticism,TSS.PhysicalReactions))
+scatterNeuroPhys + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Neuroticism", y = "Physical Reactions") 
+
+
+
+scatterNeuroPsych <- ggplot(ass1, aes(TPS.Neuroticism,TSS.PsychologicalReactions))
+scatterNeuroPsych + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Neuroticism", y = "Psychological Reactions")
+
+
+
+
+scatterNeuroTStress <- ggplot(ass1, aes(TPS.Neuroticism,TSS.TotalStress))
+scatterNeuroTStress + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Neuroticism", y = "Total Stress") 
+
+
+
+scatterPsychoticismPhys <- ggplot(ass1, aes(TPS.Psychoticism,TSS.PhysicalReactions))
+scatterPsychoticismPhys + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Psychoticism", y = "Physical Reactions")
+
+
+
+scatterPsychoticismPsycho <- ggplot(ass1, aes(TPS.Psychoticism,TSS.PsychologicalReactions))
+scatterPsychoticismPsycho + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Psychoticism", y = "Psychological Reactions") 
+
+
+
+scatterPsychoticismTStress <- ggplot(ass1, aes(TPS.Psychoticism,TSS.TotalStress))
+scatterPsychoticismTStress + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Psychoticism", y = "Total Stress") 
+
+
+
+scatterNoPsychoPhys <- ggplot(ass1, aes(NoPschot,TSS.PhysicalReactions))
+scatterNoPsychoPhys + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Psychoticism (no impossible) ", y = "Physical Reactions")
+
+
+
+scatterNoPsychoPsyc <- ggplot(ass1, aes(NoPschot,TSS.PsychologicalReactions))
+scatterNoPsychoPsyc + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Psychoticism (no impossible) ", y = "Psychological Reactions")
+
+
+
+scatterNoPsychoTStress <- ggplot(ass1, aes(NoPschot,TSS.TotalStress))
+scatterNoPsychoTStress + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Psychoticism (no impossible) ", y = "Total Stress")
+
+
+
+scatterExtroPhys <- ggplot(ass1, aes(TPS.Extroversion,TSS.PhysicalReactions))
+scatterExtroPhys + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Extroversion ", y = "Physical Reactions") 
+
+
+
+scatterExtroPsyc <- ggplot(ass1, aes(TPS.Extroversion,TSS.PsychologicalReactions))
+scatterExtroPsyc + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Extroversion ", y = "Psychological Reactions")
+
+
+
+ 
+
+
+
+scatterSocPhys <- ggplot(ass1, aes(TPS.Sociability,TSS.PhysicalReactions))
+scatterSocPhys + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Sociability ", y = "Physical Reactions")
+
+
+
+scatterSocPsyc <- ggplot(ass1, aes(TPS.Sociability,TSS.PsychologicalReactions))
+scatterSocPsyc + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Sociability ", y = "Psychological Reactions")
+
+
+
+scatterSocTStress <- ggplot(ass1, aes(TPS.Sociability,TSS.TotalStress))
+scatterSocTStress + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Sociability ", y = "Total Stress")
+
+
+
+
+#  12 correlations
+cor.test(ass1$TPS.Extroversion,ass1$TSS.PhysicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")  
+
+
+
+cor.test(ass1$TPS.Extroversion,ass1$TSS.TotalStress, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$TPS.Neuroticism,ass1$TSS.TotalStress, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$TPS.Neuroticism,ass1$TSS.PsychologicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$TPS.Neuroticism,ass1$TSS.PhysicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$TPS.Psychoticism,ass1$TSS.PhysicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$TPS.Psychoticism,ass1$TSS.PsychologicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$TPS.Psychoticism,ass1$TSS.TotalStress, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$NoPschot,ass1$TSS.PhysicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+cor.test(ass1$NoPschot,ass1$TSS.PsychologicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+
+cor.test(ass1$NoPschot,ass1$TSS.TotalStress, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+
+cor.test(ass1$TPS.Sociability,ass1$TSS.TotalStress, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+
+cor.test(ass1$TPS.Sociability,ass1$TSS.PsychologicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+
+cor.test(ass1$TPS.Sociability,ass1$TSS.PhysicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+
+########to remove outlier from  Sociability -remove values less than 2 #
+ass1$NoOutSoc<-ifelse(ass1$TPS.Sociability < 2, NA, ass1$TPS.Sociability)
+
+stat.desc(ass1$NoOutSoc, basic = FALSE, norm = TRUE)
+
+shapiro.test(ass1$NoOutSoc)
+
+densityNooutSoc <- ggplot(ass1, aes(NoOutSoc)) + 
+  theme(legend.position = "none") + 
+  geom_histogram(aes(y=..density..), 
+                 colour="black", 
+                 fill="white") +
+  stat_function(fun = dnorm, #plot a normal density function
+                args = list(mean = mean(ass1$NoOutSoc, na.rm = TRUE),  #the mean of your distribution
+                            sd = sd(ass1$NoOutSoc, na.rm = TRUE)),  #the sd of your distribution
+                colour = "black", 
+                size = 1) +
+  labs(x = " Sociability Scores(No outliers)", 
+       y = "Density")
+
+densityNooutSoc 
+
+
+qqplot.NooutSoc <- qqnorm(ass1$NoOutSoc,
+                     xlab = "Theoretical Quantiles", 
+                     ylab = "Sample Quantiles Sociability (No Outliers")
+qqline(ass1$NoOutSoc)
+
+
+scatterNooutSocPhys <- ggplot(ass1, aes(NoOutSoc,TSS.PhysicalReactions))
+scatterNooutSocPhys + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Sociability (No Outliers) ", y = "Physical Reactions") 
+
+
+scatterNooutSocPsyc <- ggplot(ass1, aes(NoOutSoc,TSS.PsychologicalReactions))
+scatterNooutSocPsyc + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Sociability (no outliers)", y = "Psychological Reactions") 
+
+
+scatterNooutSocTStress <- ggplot(ass1, aes(NoOutSoc,TSS.TotalStress))
+scatterNooutSocTStress + geom_point() + 
+  geom_smooth()+
+  geom_smooth(method = "lm", colour = "Red", se = T) + 
+  labs(x = "Sociability (No outliers", y = "Total Stress")
+
+
+cor.test(ass1$NoOutSoc,ass1$TSS.TotalStress, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoOutSoc,ass1$TSS.PsychologicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoOutSoc,ass1$TSS.PhysicalReactions, 
+         alternative = "two.sided",
+         use = "complete.obs", 
+         method = "pearson")
+
+
+
+# Correlation - one tailed test#
+cor.test(ass1$TPS.Extroversion,ass1$TSS.PhysicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")  
+
+cor.test(ass1$TPS.Extroversion,ass1$TSS.PsychologicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")  
+
+cor.test(ass1$TPS.Extroversion,ass1$TSS.TotalStress, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")  
+
+cor.test(ass1$TPS.Neuroticism,ass1$TSS.TotalStress, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Neuroticism,ass1$TSS.PsychologicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Neuroticism,ass1$TSS.PhysicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Psychoticism,ass1$TSS.PhysicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Psychoticism,ass1$TSS.PsychologicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Psychoticism,ass1$TSS.TotalStress, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoPschot,ass1$TSS.PhysicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoPschot,ass1$TSS.PsychologicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoPschot,ass1$TSS.TotalStress, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Sociability,ass1$TSS.TotalStress, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Sociability,ass1$TSS.PsychologicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$TPS.Sociability,ass1$TSS.PhysicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoOutSoc,ass1$TSS.TotalStress, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoOutSoc,ass1$TSS.PsychologicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
+
+cor.test(ass1$NoOutSoc,ass1$TSS.PhysicalReactions, 
+         alternative = "greater",
+         use = "complete.obs", 
+         method = "pearson")
